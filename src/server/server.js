@@ -15,7 +15,9 @@ const todos = [
   { id: 2, text: 'Pick up groceries', status: 'complete' }
 ];
 
-app.get('/', (req, res) => {
+const statusPaths = ['/','/active','/completed','/archived'];
+
+app.get(statusPaths, (req, res) => {
   const bundle = `//${req.hostname}:8080/public/bundle.js`;
 
   res.render('index', { bundle });
