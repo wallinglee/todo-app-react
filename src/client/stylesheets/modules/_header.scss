@@ -1,4 +1,10 @@
 // Header module
 .header {
   background-color: map-get($colors, primary);
+  color: map-get($colors, ui-light);
+
+  a {
+    color: map-get($colors, ui-light);
+    text-decoration: none;
+  }
 }
