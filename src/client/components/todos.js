@@ -14,6 +14,8 @@ const propTypes = {
   filterBy: PropTypes.string,
   todos: PropTypes.arrayOf(PropTypes.object),
   updateTodos: PropTypes.func,
+  onClickTodo: PropTypes.func,
+  archiveTodo: PropTypes.func,
 };
 
 /**
@@ -24,13 +26,15 @@ const defaultProps = {
   filterBy: '',
   todos: [],
   updateTodos: noop,
+  onClickTodo: noop,
+  archiveTodo: noop
 };
 
 /**
  * Todos component
  * @returns {ReactElement}
  */
-const Todos = ({ filterBy, todos, updateTodos }) => {
+const Todos = ({ filterBy, todos, updateTodos, onClickTodo, archiveTodo }) => {
   /**
    * Base CSS class
    */
@@ -55,25 +59,6 @@ const Todos = ({ filterBy, todos, updateTodos }) => {
   }
 
   /**
-   * Callback function to replace todo with results of fetching the todo PUT endpoint
-   *
-   * @param  {object} json - Resulting JSON from fetch
-   */
-  const putTodo = json => {
-    const index = todos.findIndex(todo => {
-      return todo.id === json.id;
-    });
-
-    updateTodos(
-      [
-        ...todos.slice(0, index),
-        json,
-        ...todos.slice(index + 1),
-      ]
-    );
-  }
-
-  /**
    * Click handler for clicking on delete button
    * Deletes todo
    *
@@ -82,20 +67,6 @@ const Todos = ({ filterBy, todos, updateTodos }) => {
   const onClickDelete = todo => {
     api('DELETE', todo, deleteTodo);
   };
-
-  /**
-   * Click handler for clicking on the todo
-   * Toggles status state of Todo
-   *
-   * @param {object} todo - Todo object
-   */
-  const onClickTodo = todo => {
-    const newTodo = Object.assign({}, todo);
-    newTodo.status = todo.status === 'complete' ? 'active' : 'complete';
-    newTodo.archive = false;
-
-    api('PUT', newTodo, putTodo);
-  }
 
   /**
    * Renders All Todos
@@ -116,25 +87,30 @@ const Todos = ({ filterBy, todos, updateTodos }) => {
         case 'completed':
           filtered = todo.status !== 'complete';
           break;
+        case 'archive':
+          filtered = !todo.archive;
+          break;
         default:
-          filtered = false;
+          filtered = todo.archive; // Hide archived todos
       }
 
       return (
         <Todo
           key={todo.id}
           filtered={filtered}
-          onClickDelete={onClickDelete.bind(this, todo)}
-          onClickTodo={onClickTodo.bind(this, todo)}
+          onClickDelete={() => {onClickDelete(todo)}}
+          onClickTodo={() => {onClickTodo(todo)}}
+          archiveTodo={() => {archiveTodo(todo)}}
           status={todo.status}
           text={todo.text}
+          filterBy={filterBy}
         />
       );
     })
   }
 
   return (
-    <ul className={baseCls}>
+    <ul className={baseCls + ' container ' + filterBy}>
       {renderTodos()}
     </ul>
   )

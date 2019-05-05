@@ -8,6 +8,7 @@ import Navbar from './navbar';
 import TodoForm from './todo-form';
 import TodoLink from './todo-link';
 import Todos from './todos';
+import SummaryBar from "./summary-bar";
 
 /**
  * TodosPage component
@@ -18,14 +19,14 @@ class TodosPage extends React.Component {
    * Base CSS class
    * @static
    */
-  static baseCls = 'todos-page'
+  static baseCls = 'todos-page';
 
   /**
    * Prop types
    * @static
    */
   static propTypes = {
-    params: PropTypes.object,
+    params: PropTypes.object
   };
 
   /**
@@ -41,11 +42,6 @@ class TodosPage extends React.Component {
       todos: [],
       filterBy: null,
     };
-
-    this.addTodo = this.addTodo.bind(this);
-    this.postTodo = this.postTodo.bind(this);
-    this.setFilterBy = this.setFilterBy.bind(this);
-    this.updateTodos = this.updateTodos.bind(this);
   }
 
   /**
@@ -53,6 +49,15 @@ class TodosPage extends React.Component {
    */
   componentDidMount() {
     api('GET', null, this.updateTodos);
+    let currStatus = this.props.location.pathname.replace('/','');
+    this.setFilterBy(currStatus);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.location.pathname !== this.props.location.pathname) {
+      let propStatus = nextProps.location.pathname.replace('/','');
+      this.setState({ filterBy:  propStatus});
+    }
   }
 
   /**
@@ -60,7 +65,7 @@ class TodosPage extends React.Component {
    *
    * @param  {string} text - Todo text
    */
-  addTodo(text) {
+  addTodo = (text) => {
     if (!text) {
       return;
     }
@@ -73,7 +78,7 @@ class TodosPage extends React.Component {
    *
    * @param  {object} json - Resulting JSON from fetch
    */
-  postTodo(json) {
+  postTodo = (json) => {
     this.setState({
       todos: [...json],
     });
@@ -84,7 +89,7 @@ class TodosPage extends React.Component {
    *
    * @param {string} filterBy - filterBy state
    */
-  setFilterBy(filterBy) {
+  setFilterBy = (filterBy) => {
     this.setState({ filterBy });
   }
 
@@ -93,18 +98,88 @@ class TodosPage extends React.Component {
    *
    * @param  {Array} todos - Array of todo objects
    */
-  updateTodos(todos) {
+  updateTodos = (todos) => {
     this.setState({ todos });
   }
+
+  /**
+   * Callback function to replace todo with results of fetching the todo PUT endpoint
+   *
+   * @param  {object} json - Resulting JSON from fetch
+   */
+  putTodo = (json) => {
+    const index = this.state.todos.findIndex((todo) => {
+      return todo.id === json.id;
+    });
+
+    this.updateTodos(
+      [
+        ...this.state.todos.slice(0, index),
+        json,
+        ...this.state.todos.slice(index + 1),
+      ]
+    );
+  }
+
+  /**
+   * Click handler for clicking on the todo
+   * Toggles status state of Todo
+   *
+   * @param {object} todo - Todo object
+   */
+  onClickTodo = (todo) => {
+    const newTodo = Object.assign({}, todo);
+    newTodo.status = todo.status === 'complete' ? 'active' : 'complete';
+    newTodo.archive = false;
+
+    api('PUT', newTodo, this.putTodo);
+  }
+
+  completeAll = () => {
+    this.state.todos.forEach((todo) => {
+      if (todo.status !== 'complete') {
+        this.onClickTodo(todo);
+      }
+    });
+  }
+
+  getActiveTaskCount = () => {
+    let numCount = 0;
+    this.state.todos.map(todo => {if(todo.status !== 'complete') numCount++});
+    return numCount;
+  }
+
+  archiveAllCompleted = (todos) => {
+    this.state.todos.forEach((todo) => {
+      if (todo.status !== 'complete') {
+        throw new Error('Todo not complete, can\'t archive.');
+      }
+      todo.archive = true;
+      api('PUT', todo, this.putTodo);
+    });
+  }
+
+  archiveTodo = (todo) => {
+    const newTodo = Object.assign({}, todo);
+    if (newTodo.status !== 'complete') {
+      throw new Error('Todo not complete, can\'t archive.');
+    }
+    newTodo.archive = true;
+
+    api('PUT', newTodo, this.putTodo);
+  };
 
   /**
    * Render
    * @returns {ReactElement}
    */
   render() {
+    const baseCls = 'todos-page';
     return (
-      <div className={this.baseCls}>
-        <Navbar filterBy={this.state.filterBy} onClickFilter={this.setFilterBy} />
+      <div className={baseCls}>
+        <Navbar filterBy={this.state.filterBy} onClickFilter={this.setFilterBy} archiveAllCompleted={this.archiveAllCompleted} />
+
+        <SummaryBar activeTasks={this.getActiveTaskCount()} completeAll={this.completeAll} />
 
         <TodoForm onSubmit={this.addTodo} />
 
@@ -112,6 +187,9 @@ class TodosPage extends React.Component {
           filterBy={this.state.filterBy}
           todos={this.state.todos}
           updateTodos={this.updateTodos}
+          onClickTodo={this.onClickTodo}
+          putTodo={this.putTodo}
+          archiveTodo={this.archiveTodo}
         />
       </div>
     );

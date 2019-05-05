@@ -31,8 +31,10 @@ const App = ({ children }) => {
       <div className={baseCls}>
         <Header />
         <Switch>
-          <Route exact path="/" component={TodosPage} />
-          <Route exact path="/(active|completed|archived)" component={TodosPage} />
+          <Route path="/" key="all" component={TodosPage} />
+          <Route path="/active" key="active" component={TodosPage} />
+          <Route path="/completed" key="completed" component={TodosPage} />
+          <Route path="/archive" key="archive" component={TodosPage} />
         </Switch>
       </div>
     </BrowserRouter>

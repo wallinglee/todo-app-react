@@ -10,6 +10,8 @@ const noop = () => {};
 const propTypes = {
   onClick: PropTypes.func,
   text: PropTypes.string,
+  addClass: PropTypes.string,
+  disabled: PropTypes.bool
 };
 
 /**
@@ -19,20 +21,22 @@ const propTypes = {
 const defaultProps = {
   onClick: noop,
   text: '',
+  addClass: '',
+  disabled: false
 };
 
 /**
  * Button component
  * @returns {ReactElement}
  */
-const Button = ({ text, onClick }) => {
+const Button = ({ text, onClick, addClass, disabled }) => {
   /**
    * Base CSS class
    */
   const baseCls = 'button';
 
   return (
-    <button className={baseCls} onClick={onClick}>
+    <button className={baseCls + addClass} onClick={onClick} disabled={disabled}>
       {text}
     </button>
   )

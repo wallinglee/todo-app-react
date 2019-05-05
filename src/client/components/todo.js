@@ -16,6 +16,8 @@ const propTypes = {
   onClickTodo: PropTypes.func,
   status: PropTypes.string,
   text: PropTypes.string,
+  archiveTodo: PropTypes.func,
+  filterBy: PropTypes.string
 };
 
 /**
@@ -28,13 +30,15 @@ const defaultProps = {
   onClickTodo: noop,
   status: '',
   text: '',
+  archiveTodo: noop,
+  filterBy: ''
 };
 
 /**
  * Todo component
  * @returns {ReactElement}
  */
-const Todo = ({ filtered, onClickDelete, onClickTodo, status, text }) => {
+const Todo = ({ filtered, onClickDelete, onClickTodo, status, text, archiveTodo, filterBy }) => {
   /**
    * Base CSS class
    */
@@ -44,11 +48,25 @@ const Todo = ({ filtered, onClickDelete, onClickTodo, status, text }) => {
     + (status === 'complete' ? ' todo--status-complete' : '')
     + (filtered ? ' todo--filtered' : '');
 
-  return (
-    <li className={todoCls}>
-      <TodoLink text={text} onClick={onClickTodo} />
+  const opt = text + 'ID';
 
-      <Button text="Delete" onClick={onClickDelete} />
+  return (
+    <li className={todoCls + ' row align-items-center'}>
+      <span className="col-11">
+        <input
+          type="checkbox"
+          onChange={onClickTodo}
+          checked={status === 'complete'}
+          id={opt}
+        />
+        <TodoLink opt={opt} text={text} onClick={onClickTodo} />
+        {(status === 'complete' && filterBy !== 'archive') && (
+          <Button addClass=" archive" text="Archive" onClick={archiveTodo} />
+        )}
+      </span>
+      <span className="col-1 text-center">
+        <Button addClass=" delete" text="&times;" onClick={onClickDelete} />
+      </span>
     </li>
   );
 }

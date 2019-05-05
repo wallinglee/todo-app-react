@@ -1,6 +1,7 @@
 import { NavLink } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import React from 'react';
+import Button from './button';
 
 const noop = () => {};
 
@@ -26,52 +27,59 @@ const defaultProps = {
  * Navbar component
  * @returns {ReactElement}
  */
-const Navbar = ({ filterBy, onClickFilter }) => {
+const Navbar = ({ filterBy, onClickFilter, archiveAllCompleted }) => {
   /**
    * Base CSS class
    */
-  const baseCls = 'navbar'
-
-  let activeLinkCls = `${baseCls}__item`;
-  activeLinkCls += filterBy === 'active' ? ` ${baseCls}__item--active` : '';
-
-  let completedLinkCls = `${baseCls}__item`;
-  completedLinkCls += filterBy === 'completed' ? ` ${baseCls}__item--active` : '';
+  const baseCls = 'navbar';
+  const activeClassName = `${baseCls}__item--active`;
 
   return (
     <div className={baseCls}>
-      <div className="row">
-        <div className="col-9">
-          <NavLink
-            to="/"
-            activeClassName={`${baseCls}__item--active`}
-            className={`${baseCls}__item`}
-            onClick={() => onClickFilter('')}
-          >
+      <div className="container">
+        <div className="row">
+          <div className="col-9">
+            <NavLink
+              to="/"
+              exact
+              activeClassName={activeClassName}
+              className={baseCls + '__item'}
+              onClick={() => onClickFilter('')}
+            >
             All
-          </NavLink>
-          <NavLink
-            to="/active"
-            activeClassName={`${baseCls}__item--active`}
-            className={`${baseCls}__item`}
-            onClick={() => onClickFilter('active')}
-          >
-            Active1
-          </NavLink>
-          <span
-            className={activeLinkCls}
-            onClick={() => onClickFilter('active')}
-          >
-            Active2
-          </span>
-          <span
-            className={completedLinkCls}
-            onClick={() => onClickFilter('completed')}
-          >
+            </NavLink>
+            <NavLink
+              to="/active"
+              exact
+              activeClassName={activeClassName}
+              className={baseCls + '__item'}
+              onClick={() => onClickFilter('active')}
+            >
+            Active
+            </NavLink>
+            <NavLink
+              to="/completed"
+              exact
+              activeClassName={activeClassName}
+              className={baseCls + '__item'}
+              onClick={() => onClickFilter('completed')}
+            >
             Completed
-          </span>
+            </NavLink>
+            <NavLink
+              to="/archive"
+              exact
+              activeClassName={activeClassName}
+              className={baseCls + '__item'}
+              onClick={() => onClickFilter('archive')}
+            >
+            Archive
+            </NavLink>
+          </div>
+          <div className="col-3 text-right">
+            <Button text="Archive all completed" onClick={archiveAllCompleted} />
+          </div>
         </div>
-        <div className="col-3 text-right">Archive all completed</div>
       </div>
     </div>
   );

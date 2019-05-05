@@ -10,6 +10,7 @@ const noop = () => {};
 const propTypes = {
   onClick: PropTypes.func,
   text: PropTypes.string,
+  opt: PropTypes.string
 };
 
 /**
@@ -19,22 +20,21 @@ const propTypes = {
 const defaultProps = {
   onClick: noop,
   text: '',
+  opt: ''
 };
 
 /**
  * Link component
  * @returns {ReactElement}
  */
-const TodoLink = ({ text, onClick }) => {
+const TodoLink = ({ text, onClick, opt }) => {
   /**
    * Base CSS class
    */
   const baseCls = 'todo-link';
 
   return (
-    <div className={baseCls} onClick={onClick}>
-      {text}
-    </div>
+    <label htmlFor={opt} className={baseCls} onClick={onClick}> <span></span> {text}</label>
   );
 };
 
