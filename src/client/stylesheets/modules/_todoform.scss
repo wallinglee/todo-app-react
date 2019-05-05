@@ -1,0 +1,28 @@
+// Todo Form module
+.todo-form {
+  padding-bottom: 2rem;
+
+  form {
+    input {
+      width: 100%;
+      border: 1px solid map-get($colors, gray);
+      border-radius: .25rem;
+      padding: .5rem 1.5rem;
+      font-size: 1.375rem;
+      font-weight: 500;
+      color: map-get($colors, gray);
+      background: rgb(255,255,255);
+      background: linear-gradient(0deg, map-get($colors, ui-light) 0%, map-get($colors, lightgray) 100%);
+
+      &::placeholder {
+        color: map-get($colors, gray);
+      }
+
+      &:focus,
+      &active {
+        outline: none;
+        border: 1px solid map-get($colors, gray);
+      }
+    }
+  }
+}

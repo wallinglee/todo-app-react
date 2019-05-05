@@ -1,0 +1,28 @@
+// Summary Bar module
+.summary-bar {
+  padding: 2rem 0;
+  font-size: 1.125rem;
+  vertical-align: baseline;
+  color: map-get($colors, darkgray);
+
+  button {
+    margin-left: 1rem;
+    font-size: .875rem;
+    font-weight: 700;
+    border: 0;
+    background-color: transparent;
+    color: map-get($colors, primary);
+    cursor: pointer;
+
+    &:focus,
+    &:active {
+      border: 0;
+      outline: none;
+    }
+
+    &:disabled {
+      opacity: .65;
+      cursor: not-allowed;
+    }
+  }
+}
