@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
+const uuidV1 = require('uuid/v1');
 
 const app = express();
 
@@ -15,7 +16,7 @@ const todos = [
   { id: 2, text: 'Pick up groceries', status: 'complete' }
 ];
 
-const statusPaths = ['/','/active','/completed','/archived'];
+const statusPaths = ['/','/active','/completed','/archive'];
 
 app.get(statusPaths, (req, res) => {
   const bundle = `//${req.hostname}:8080/public/bundle.js`;
@@ -45,7 +46,7 @@ app.post('/todos', (req, res) => {
     return;
   }
 
-  const id = todos.length + 1;
+  const id = uuidV1();//todos.length + 1;
   const newTodo = { id, text, status: 'active' };
 
   todos.push(newTodo);
@@ -54,11 +55,19 @@ app.post('/todos', (req, res) => {
 });
 
 app.delete('/todos/:id', (req, res) => {
-  res.status(500).send({ message: 'not implemented' });
+  const id = Number(req.params.id);
+  const objToDelete = req.body.data;
+  const idx = todos.findIndex(todo => todo.id === id);
+  todos.splice(idx, 1);
+  res.status(200).json(objToDelete);
 });
 
 app.put('/todos/:id', (req, res) => {
-  res.status(500).send({ message: 'not implemented' });
+  const idToUpdate = Number(req.params.id);
+  const newObj = req.body.data;
+  const i = todos.findIndex(todo => todo.id === idToUpdate);
+  todos[i] = newObj;
+  res.status(200).json(newObj);
 });
 
 // Node server.
